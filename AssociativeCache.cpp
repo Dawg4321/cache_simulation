@@ -3,11 +3,8 @@
 AssociativeCache::AssociativeCache(int size){
     cache_block1 = new AssociativeCacheLine[size];
     block_size = size;
-
-    for(int i = 0; i < size; i++)
-        cache_block1[i].invalid = true;
-    
     fifo_tracker = 0;
+    invalidateCache();
 }
 
 AssociativeCache::~AssociativeCache(){
@@ -91,5 +88,12 @@ void AssociativeCache::loadCacheSlot(int cache_slot, int tag, char bytes[4]){
     // copy bytes into address
     for(int j = 0; j < 4; j++)
         cache_block1[cache_slot].bytes[j] = bytes[j]; 
+    return;
+}
+
+void AssociativeCache::invalidateCache(){
+    for(int i = 0; i < block_size; i++)
+        cache_block1[i].invalid = true;
+    
     return;
 }
