@@ -17,14 +17,13 @@ class AssociativeCache
         AssociativeCache(int size);
         ~AssociativeCache();
         
-        char getByte(int x, bool *cache_hit, char input_bytes[4]);
-        void loadCacheSlot(int cache_slot, int tag, char bytes[4]);
+        char getByte(int x, char input_bytes[4]);
+        void invalidateCache();
     private:
-        struct AssociativeCacheLine *cache_block1; // dynamic array to store each cache line
+        struct AssociativeCacheLine *cache_entries; // dynamic array to store each cache line
+
         int block_size; // size of cache block
 
-        int fifo_tracker; // simple counter to track which line has been in the cache for the longest time 
-        
         int hit_counter; // counter to track number of cache hits 
         int miss_counter; // counter to track number of cache misses
 };
