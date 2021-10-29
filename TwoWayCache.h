@@ -2,11 +2,11 @@
 #define TWOWAYCACHE_H
 
 #include <stdio.h>
-#include <stdbool.h>
+#include <string>
 
 using namespace std;
 
-struct TwoWayCacheLine{
+struct TwoWayCacheEntry{
     int LRU; 
     bool invalid;
     unsigned short upper_tag; 
@@ -19,9 +19,12 @@ class TwoWayCache
         TwoWayCache();
         ~TwoWayCache();
         void invalidateCache();
-        char getByte(int x, bool *cache_hit, char input_bytes[4]);
+        char getByte(unsigned int x, char input_bytes[4]);
     private:
-        struct TwoWayCacheLine cache_entries[2][16384];
+        struct TwoWayCacheEntry cache_entries[2][16384];
+
+        int hit_counter; // counter to track number of cache hits 
+        int miss_counter; // counter to track number of cache misses
 };
 
 #endif
