@@ -16,12 +16,17 @@ struct TwoWayCacheEntry{
 class TwoWayCache
 {
     public:
+        // contructor and destructor
         TwoWayCache();
         ~TwoWayCache();
-        void invalidateCache();
-        char getByte(unsigned int x, char input_bytes[4]);
+        // member functions
+        void invalidateCache(); // function to invalidate all entries within cache
+        char getByte(unsigned int address, char input_bytes[4]); // function to query cache for a specific address value
+                                                                 // if cache miss occurs, load bytes from input array
     private:
-        struct TwoWayCacheEntry cache_entries[2][16384];
+        struct TwoWayCacheEntry cache_entries[2][16384]; // Multi-dimensional array holding cache entries
+                                                         // each slot of the outer dimension represents each cache block
+                                                         // the inner array represents each cache line in a block
 
         int hit_counter; // counter to track number of cache hits 
         int miss_counter; // counter to track number of cache misses
