@@ -24,27 +24,28 @@ char AssociativeCache::getByte(int addr, char input_bytes[4]){
     // iterate through cache slots to check for cache hit
     for(int i = 0; i < block_size; i++){
         if(cache_entries[i].tag == tag_no){
-            // cache hit
-            hit_counter++;
+            // cache hit as tag in address matches tag within cache line from for loop
 
             printf("%d. cache hit on Addr: 0x%x\n", hit_counter,addr);
             printf("\tByte No: %d, Contents: %c\n", byte_no, input_bytes[byte_no]);
 
             output_to_cpu = cache_entries[i].bytes[byte_no]; // set output variable to requested byte
-            break;
+            hit_counter++; // increment hit counter to track this hit
+            
+            break; // break from loop as hit or miss condition has been met
         }
         else if (i == block_size - 1 && !cache_entries[i].invalid || cache_entries[i].invalid){
-            // cache miss as address not found in all valid cache slots
-            // cache is currently full thus need to overwrite line using FIFO basis
-            miss_counter++;
+            // cache miss as address not found in all valid cache slots 
+            // or cache is full thus need to overwrite line using FIFO basis
             
             printf("%d. cache miss on 0x%x\n", miss_counter,addr);
             printf("\tByte No: %d, Contents = %c\n", byte_no, input_bytes[byte_no]);
 
             // push up each entry into the queue
-            // acts as a FIFO Queue as first value in will be pushed out first 
-            for(int i = block_size - 1; i > 0; i--)
-                cache_entries[i] = cache_entries[i-1];
+            // acts as a FIFO Queue as first value in will be pushed out first
+            // this is not an efficient method but is more representative of how hardware handles entries 
+            for(int i = block_size - 1; i > 0; i--) // iterate through each cache slot
+                cache_entries[i] = cache_entries[i-1]; // move up previous entry to current entry
             
             // append first cache slot with tag 
             cache_entries[0].tag = tag_no;
@@ -52,15 +53,17 @@ char AssociativeCache::getByte(int addr, char input_bytes[4]){
             cache_entries[0].invalid = false;
             // copy bytes into address
             for(int j = 0; j < 4; j++)
-                cache_entries[0].bytes[j] = input_bytes[j]; 
+                cache_entries[0].bytes[j] = input_bytes[j];
+                        
+            miss_counter++; // increment miss counter to track this miss 
 
-            break; // break from loop as cache miss condition is true. Not possible to achieve a hit
+            break; // break from loop as hit or miss condition has been met
         }
         else{
             // do nothing as current slot in cache is valid but does not have a matching tag
         }
     }
-    return output_to_cpu;
+    return output_to_cpu; // return byte from specified cache location
 }
 
 void AssociativeCache::invalidateCache(){
