@@ -9,62 +9,64 @@ TwoWayCache::TwoWayCache(){ // TwoWayCache constructor
     invalidateCache();
 }
 
-TwoWayCache::~TwoWayCache(){ // DM Cache destructor
+TwoWayCache::~TwoWayCache(){ // TwoWayCache destructor
 }
 
 // ~~~TwoWayCache Member Functions~~~
 
-// ~~getByte()~~
+// ~~getByte~~
 // 
 //
-// ~~~~~~~~~~~~~
+// ~~~~~~~~~~~
 char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
 
-    char output_to_cpu; // return variable 
+    char output_to_cpu; // return variable for byte from cache
 
     int byte_no = addr&0x3; // gathering byte number (last 2 bits in addr) with "and" operation 
-    int set_no = (addr&0x0000FFFC)>>2; // gathering set number (14 bits after byte num in addr) using "and" and shift 2 bits to right (set_no>2)
+    int set_no = (addr&0xFFFC)>>2; // gathering set number (14 bits after byte num in addr) using "and" and shift 2 bits to right (set_no>2)
     int upper_tag_no = (addr&0xFFFF0000)>>16; // and 16 bits
 
     string print_tag; // string to store whether cache request was a hit or a miss for result printing
 
     if(cache_entries[0][set_no].upper_tag == upper_tag_no && !cache_entries[0][set_no].invalid){
-        // cache hit on block 0
+        // cache hit on block 0 as tag in address matches tag within cache line from set number
         
         print_tag = "hit B0"; // setting print_tag to hit
-                              // this is used when printing getByte request
+                              // this is used when printing getByte request result
         output_to_cpu = cache_entries[0][set_no].bytes[byte_no]; // set output variable to corresponding byte from cache
 
         hit_counter++; // increment hit counter to track this hit
     }
     else if(cache_entries[1][set_no].upper_tag == upper_tag_no && !cache_entries[1][set_no].invalid){
-        // cache hit on block 1
+        // cache hit on block 1 as tag in address matches tag within set number's cache line
+
         print_tag = "hit B1"; // setting print_tag to hit
-                           // this is used when printing getByte request
+                              // this is used when printing getByte request result
         output_to_cpu = cache_entries[1][set_no].bytes[byte_no]; // set output variable to corresponding byte from cache
 
         hit_counter++; // increment hit counter to track this hit
     }
     else{
-        // cache miss (matching upper tag was not found within a valid cache entry)
+        // cache miss (matching upper tag was not found within a valid cache entry of corresponding set number)
         
         print_tag = "miss"; // setting print_tag to miss
-                            // this is used when printing getByte request
+                            // this is used when printing getByte request result
 
         int lru_slot = 0; // variable to help determine which cache slot was the least recently used 
         if(cache_entries[0][set_no].LRU){ // if zeroth cache block was Least Recently Used
             lru_slot = 0; // set lru_slot to 0 so 0th cache slot if modified
-            cache_entries[1][set_no].LRU = true; // set cache block 1's corresponding line to Least Recently Used so it will be overwritten in next miss
+            cache_entries[1][set_no].LRU = true; // set cache block 1's corresponding line to Least Recently Used 
+                                                 // so it will be overwritten in next miss
         }
         else{ // if first cache block was Least Recently Used
             lru_slot = 1; // set lru_slot to 1 so 1st cache slot if modified
-            cache_entries[0][set_no].LRU = true;// set cache block 0's corresponding line to Least Recently Used so it will be overwritten in next miss
+            cache_entries[0][set_no].LRU = true; // set cache block 0's corresponding line to Least Recently Used
+                                                 // so it will be overwritten in next miss
         }
 
-        cache_entries[lru_slot][set_no].upper_tag = upper_tag_no; // set cache line to corresponding values
+        cache_entries[lru_slot][set_no].upper_tag = upper_tag_no; // setting cache line to corresponding values
         cache_entries[lru_slot][set_no].invalid = false;          // lru_slot = which cache block to access
         cache_entries[lru_slot][set_no].LRU = false;              // set_no = which line within block to access
-                                                                  // byte_no = which byte to access from block
 
         
         for(int i = 0; i < 4; i++) // iterate through bytes to load
@@ -101,20 +103,20 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
     return output_to_cpu; // return byte from specified cache location
 }
 
-// ~~invalidateCache()~~
+// ~~invalidateCache~~
 // 
-// ~~~~~~~~~~~~~~~~~~~~~
+// ~~~~~~~~~~~~~~~~~~~
 void TwoWayCache::invalidateCache(){
     
     hit_counter = 0; // reseting hit counter
     miss_counter = 0; // reseting miss counter
 
-    for(int i = 0; i < 2; i++){ // iterate through outer array (the two cache blocks)
+    for(int i = 0; i < 2; i++){ // iterate through outer array (iterate through the two cache blocks)
         for(int j = 0; j < sizeof(cache_entries[i])/sizeof(cache_entries[i][0]); j++){ // iterate through each line within cache
             cache_entries[i][j].invalid = true; // invalidate cache line
             if(i == 0) // if the first cache block is being iterated through
                 cache_entries[i][j].LRU = true; // ensure 0th cache block is set to least recently used. 
-                                                // This is done so that cache block 0 is first used over cache block 1
+                                                // This is done to ensure that cache block 0 is first used over cache block 1
         }
     }
     return;
