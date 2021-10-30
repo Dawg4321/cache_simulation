@@ -24,7 +24,7 @@ class DMCache
                                                   // if cache miss occurs, load bytes from input array
     private:
         struct DMCacheEntry cache_entries[16384]; // Array representing a cache block
-                                                  // Each entry represents a cache line.
+                                                  // Each entry represents a cache line
         int hit_counter; // counter to track number of cache hits 
         int miss_counter; // counter to track number of cache misses
 };

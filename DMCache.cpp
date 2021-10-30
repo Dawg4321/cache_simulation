@@ -59,11 +59,11 @@ char DMCache::getByte(int addr, char input_bytes[4]){
 
         printf("Direct Mapped Cache Request Table\n"); // print title
         // print line seperator
-        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.12s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
+        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.10s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
         // print title line of table
         printf("| # |Address (hex)|tag (hex)|set (hex)|byte# (hex)| hit/miss |hit#|miss#|\n"); 
         // print line sperator
-        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.12s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
+        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.10s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
     }
     // print details regarding cache 
     printf("|%3d|   %08x  |   %04x  |   %04x  |     %1x     |Cache %-4s|%4d|%5d|\n",hit_counter + miss_counter, // total number of cache queries
