@@ -34,14 +34,14 @@ int main(){
 
     char input_bytes[4] = {'b','y','t','e'}; // sample bytes to use to emulate bytes being transfered from DRAM
     
-    if(input =='1'){
+    if(input =='1'){ // if user selects associative cache 
         unsigned int cache_size = 0; //variable to store user input for associative cache block size
         
-        cout << "Please specify a value for the block size of the associative cache:"; // prompting user input
+        cout << "Please specify a value for the block size of the associative cache: "; // prompting user input
         
         // loop until a valid integer input has been recieved 
         while(!(cin >> cache_size)){ // recieve and check if input is valid
-            cout << "\nError, please input an integer value:"; // generate an error output
+            cout << "\nError, please input an integer value: "; // generate an error output
             
             cin.clear(); // clear the previous input
             cin.ignore(1000,'\n'); // discard the previous input before taking another input
@@ -49,19 +49,25 @@ int main(){
         
         AssociativeCache cache_obj(cache_size);  // create Associative Cache Object with user specified integer input
         
+        cache_obj.printSpecs(); // printing specifications of cache being modelled
+
         // loop to emulate all address requests from the addr vector
         for(int i = 0; i < addr.size(); i++) // iterate through each address in the address request vector
             cache_obj.getByte(addr[i], input_bytes); // emulate a Cache Read Request using the cache object
     }
-    else if(input== '2'){
+    else if(input== '2'){ // if user selects direct mapped cache 
         DMCache cache_obj; // create Direct Mapped Cache Object
         
+        cache_obj.printSpecs(); // printing specifications of cache being modelled
+
         // loop to emulate all address requests from the addr vector
         for(int i = 0; i < addr.size(); i++) // iterate through each address in the address request vector
             cache_obj.getByte(addr[i], input_bytes); // emulate a Cache Read Request using the cache object
     }
-    else{
+    else{// if user selects two way set associative cache 
         TwoWayCache cache_obj; // create Two Way Set Associative Cache Object
+
+        cache_obj.printSpecs(); // printing specifications of cache being modelled
 
         // loop to emulate all address requests from the addr vector
         for(int i = 0; i < addr.size(); i++) // iterate through each address in the address request vector
@@ -83,11 +89,15 @@ vector<unsigned int> loadAddresses(){
     ifstream addr_file; // file stream object to load files from addr.txt
     addr_file.open("addr.txt",ios::in); // open addr.txt for reading
 
-    if (addr_file.is_open()){  // checking if addr.txt is open
+    if (!addr_file.is_open()){  // checking if addr.txt is open
+        cout << "Error opening address text file. Please ensure the address file is called 'addr.txt'\n";
+        return addr_arr;
     }
-    while(!addr_file.eof()){  // reads data from addr.txt and place into string
-        addr_file >> hex >> addr_int; // convert hex value within string to unsigned int 
-        addr_arr.push_back(addr_int); // adding hex value to vector
+    
+    // reads data from addr.txt and place into string
+    while(addr_file >> hex >> addr_int){ // load file from addr.txt to unsigned int
+                                         // >> hex tells that the value being loaded is hex 
+        addr_arr.push_back(addr_int); // adding loaded hex value to vector
     }
     addr_file.close(); // close addr.txt
     

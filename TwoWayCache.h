@@ -21,6 +21,7 @@ class TwoWayCache
         ~TwoWayCache();
         // member functions
         void invalidateCache(); // function to invalidate all entries within cache
+        void printSpecs(); // function to print specifications for modelled cache 
         char getByte(unsigned int address, char input_bytes[4]); // function to query cache for a specific address value
                                                                  // if cache miss occurs, load bytes from input array
     private:

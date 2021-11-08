@@ -27,12 +27,15 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
     int upper_tag_no = (addr&0xFFFF0000)>>16; // and 16 bits
 
     string print_tag; // string to store whether cache request was a hit or a miss for result printing
+    string write_loc; // string to store which cache line is written to for use in result print out
 
     if(cache_entries[0][set_no].upper_tag == upper_tag_no && !cache_entries[0][set_no].invalid){
         // cache hit on block 0 as tag in address matches tag within cache line from set number
         
         print_tag = "hit B0"; // setting print_tag to hit
+        write_loc = "hit B0"; // setting print_tag to hit
                               // this is used when printing getByte request result
+        
         output_to_cpu = cache_entries[0][set_no].bytes[byte_no]; // set output variable to corresponding byte from cache
 
         hit_counter++; // increment hit counter to track this hit
@@ -82,7 +85,7 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
     if(hit_counter+miss_counter == 1){ // if this is the first time getByte is called, create table headers 
         string line = "--------------------------------------------------------------"; // line string for printf output to help table format
 
-        printf("2 Way Associative Cache Request Table\n"); // print title
+        printf("****2 Way Set Associative Cache Request Table*****\n"); // print title
         // print line seperator
         printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.12s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
         // print title line of table
@@ -108,16 +111,36 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
 // ~~~~~~~~~~~~~~~~~~~
 void TwoWayCache::invalidateCache(){
     
-    hit_counter = 0; // reseting hit counter
-    miss_counter = 0; // reseting miss counter
+    hit_counter = 0; // resetting hit counter
+    miss_counter = 0; // resetting miss counter
 
     for(int i = 0; i < 2; i++){ // iterate through outer array (iterate through the two cache blocks)
         for(int j = 0; j < sizeof(cache_entries[i])/sizeof(cache_entries[i][0]); j++){ // iterate through each line within cache
             cache_entries[i][j].invalid = true; // invalidate cache line
             if(i == 0) // if the first cache block is being iterated through
                 cache_entries[i][j].LRU = true; // ensure 0th cache block is set to least recently used. 
-                                                // This is done to ensure that cache block 0 is first used over cache block 1
+                                                // This is done to ensure that cache block 0 is the first block to be overwritten
         }
     }
     return;
+}
+
+// ~~printSpecs~~
+//
+// ~~~~~~~~~~~~~~
+void TwoWayCache::printSpecs(){
+    int set_size = sizeof(cache_entries[0])/sizeof(cache_entries[0][0]); // set size is equal to the length of each way.
+                                                                         // in terms of the multidimensional array, this is the length of the inner array
+    int num_of_sets = sizeof(cache_entries)/sizeof(cache_entries[0]); // the number of sets is equal to the number of cache ways used
+                                                                      // in terms of the multidimensional array, this is the length of the outer array
+    int num_of_cache_lines = set_size*num_of_sets; // the number of cache lines in the cache is equal to the number of sets times the number of ways 
+    int cache_size = 4*num_of_cache_lines; // cache size is equal to the number of cache lines times the number of bytes per line (4 bytes per line)
+
+    printf("****Cache Specifications****\n"); // print title 
+    printf("Cache Line Size: 4 bytes\n"); // print number of bytes per line
+    printf("Total Number of Lines: %d Lines\n", num_of_cache_lines); // print number of lines 
+    printf("Number of Ways: %d\n", num_of_sets); // print number of sets
+    printf("Number of Sets: %d Lines\n", set_size); // print set size
+    printf("Cache Size: %d bytes\n", cache_size); // print cache size
+    printf("****\n");
 }

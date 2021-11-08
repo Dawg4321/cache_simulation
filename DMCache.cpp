@@ -25,7 +25,8 @@ char DMCache::getByte(int addr, char input_bytes[4]){
     int set_no = (addr&0x0000FFFC)>>2; // gathering set number (14 bits after byte num in addr) using "and" and shift 2 bits to right (set_no>2)
     int upper_tag_no = (addr&0xFFFF0000)>>16; // gathering tag number (16 bits after set number in addr) using "and" and shift 16 bits to the right (tag>16)
     
-    string print_tag;
+    string print_tag; // string to store whether cache request was a hit or a miss for use in result print out
+    
     if(cache_entries[set_no].upper_tag == upper_tag_no && !cache_entries[set_no].invalid){
         // cache hit as tag in address matches tag within set number's cache line
         
@@ -57,7 +58,7 @@ char DMCache::getByte(int addr, char input_bytes[4]){
     if(hit_counter+miss_counter == 1){ // if this is the first time getByte is called, create table headers 
         string line = "--------------------------------------------------------------"; // line string for printf output to help table format
 
-        printf("Direct Mapped Cache Request Table\n"); // print title
+        printf("****Direct Mapped Cache Request Table****\n"); // print title
         // print line seperator
         printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.10s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
         // print title line of table
@@ -75,7 +76,6 @@ char DMCache::getByte(int addr, char input_bytes[4]){
                                                                                     hit_counter, // number of hits
                                                                                     miss_counter // number of misses
                                                                                     );
-
     return output_to_cpu; // return byte from specified cache location
 }
 
@@ -90,4 +90,23 @@ void DMCache::invalidateCache(){
     for(int i = 0; i < sizeof(cache_entries)/sizeof(cache_entries[0]); i++) // iterate through each line within cache
         cache_entries[i].invalid = true; // invalidate cache line
     return;
+}
+
+// ~~printSpecs~~
+//
+// ~~~~~~~~~~~~~~
+void DMCache::printSpecs(){
+    int set_size = sizeof(cache_entries)/sizeof(cache_entries[0]); // set size is equal to the length of set
+    int num_of_sets = 1; // the number of sets is equal to the number of cache ways used
+                         // num_of_sets = 1 as it Direct Mapped Cache is equivalent to 1 way set associative cache
+    int num_of_cache_lines = set_size*num_of_sets; // the number of cache lines in the cache is equal to the number of sets times the number of ways 
+    int cache_size = 4*num_of_cache_lines; // cache size is equal to the number of cache lines times the number of bytes per line (4 bytes per line)
+
+    printf("****Cache Specifications****\n"); // print title 
+    printf("Cache Line Size: 4 bytes\n"); // print number of bytes per line
+    printf("Total Number of Lines: %d Lines\n", num_of_cache_lines); // print number of lines 
+    printf("Number of Ways: %d\n", num_of_sets); // print number of sets
+    printf("Number of Sets: %d Lines\n", set_size); // print set size
+    printf("Cache Size: %d bytes\n", cache_size); // print cache size
+    printf("****\n");
 }
