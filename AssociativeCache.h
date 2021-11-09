@@ -8,7 +8,7 @@ using namespace std;
 
 struct AssociativeCacheLine{
     bool invalid;
-    int tag; // 30 bit tag 
+    unsigned int tag; // 30 bit tag 
     char bytes[4];
 };
 
@@ -26,7 +26,7 @@ class AssociativeCache
     private:
         struct AssociativeCacheLine *cache_entries; // dynamic array to store each cache line
                                                     // Each entry represents a cache line
-        int block_size; // size of cache block
+        int set_size; // size of cache set
         int hit_counter; // counter to track number of cache hits 
         int miss_counter; // counter to track number of cache misses
 };

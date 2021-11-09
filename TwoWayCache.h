@@ -6,7 +6,7 @@
 
 using namespace std;
 
-struct TwoWayCacheEntry{
+struct TwoWayCacheLine{
     int LRU; 
     bool invalid;
     unsigned short upper_tag; 
@@ -25,9 +25,9 @@ class TwoWayCache
         char getByte(unsigned int address, char input_bytes[4]); // function to query cache for a specific address value
                                                                  // if cache miss occurs, load bytes from input array
     private:
-        struct TwoWayCacheEntry cache_entries[2][16384]; // Multi-dimensional array holding cache entries
-                                                         // each slot of the outer dimension represents each cache block
-                                                         // the inner array represents each cache line in a block
+        struct TwoWayCacheLine cache_entries[2][16384]; // Multi-dimensional array holding cache entries
+                                                         // each slot of the outer dimension represents each way
+                                                         // the inner array represents the cache lines in each way
         int hit_counter; // counter to track number of cache hits 
         int miss_counter; // counter to track number of cache misses
 };

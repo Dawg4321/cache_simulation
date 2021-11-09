@@ -28,6 +28,9 @@ DMCache::~DMCache(){ // DMCache destructor
     In the event of a cache miss, four bytes are loaded into corresponding set in cache_entries array from input variable. Requested byte is also returned.
     This will overwrite a previous entry.
 
+    During each request, the details of the request are outputed in a table format using printf. 
+    If the number of requests is 0, the titles for the table will be printed. 
+
     ~~ input variables ~~
 
     -> int addr = Reqeuested address from the cpu.
@@ -124,9 +127,16 @@ void DMCache::invalidateCache(){
     return;
 }
 
-// ~~printSpecs~~
-//
-// ~~~~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~printSpecs~~~~~~~~~~~~~~~~~~~~
+
+    Simple function which prints out specifications of cache being simulated.
+
+    ~~ Operation ~~
+
+    Simple Cache calculations are computed to determine specifics details.
+    Specifications are then outputed using printf.
+
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 void DMCache::printSpecs(){
     int set_size = sizeof(cache_entries)/sizeof(cache_entries[0]); // set size is equal to the length of set
     int num_of_sets = 1; // the number of sets is equal to the number of cache ways used

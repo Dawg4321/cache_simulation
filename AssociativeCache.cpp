@@ -31,6 +31,9 @@ AssociativeCache::~AssociativeCache(){ // AssociativeCache destructor
     During each cache miss, all cache entries are pushed up in the cache_entries array as would be done in a hardware implementation 
     of Fully Associative Cache.
 
+    During each request, the details of the request are outputed in a table format using printf. 
+    If the number of requests is 0, the titles for the table will be printed. 
+
     ~~ input variables ~~
 
     -> int addr = Reqeuested address from the cpu.
@@ -146,9 +149,11 @@ void AssociativeCache::invalidateCache(){
     return;
 }
 
-// ~~printSpecs~~
-//
-// ~~~~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~printSpecs~~~~~~~~~~~~~~~~~~~~
+
+    Simple function which prints out specifications of cache being simulated.
+
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 void AssociativeCache::printSpecs(){
     printf("****Cache Specifications****\n"); // print title
     printf("Cache Line Size: 4 bytes\n"); // print number of bytes per cache line

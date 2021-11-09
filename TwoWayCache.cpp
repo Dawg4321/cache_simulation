@@ -29,6 +29,9 @@ TwoWayCache::~TwoWayCache(){ // TwoWayCache destructor
     For example, if the zeroth way part of the set was the least recently used cache. It will be overwrited next on a cache miss 
     with the corresponding set number 
 
+    During each request, the details of the request are outputed in a table format using printf. 
+    If the number of requests is 0, the titles for the table will be printed. 
+
     ~~ input variables ~~
 
     -> int addr = Reqeuested address from the cpu.
@@ -158,9 +161,16 @@ void TwoWayCache::invalidateCache(){
     return;
 }
 
-// ~~printSpecs~~
-//
-// ~~~~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~printSpecs~~~~~~~~~~~~~~~~~~~~
+
+    Simple function which prints out specifications of cache being simulated.
+    
+    ~~ Operation ~~
+
+    Simple Cache calculations are computed to determine specifics details.
+    Specifications are then outputed using printf.
+
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 void TwoWayCache::printSpecs(){
     int set_size = sizeof(cache_entries[0])/sizeof(cache_entries[0][0]); // set size is equal to the length of each way.
                                                                          // in terms of the multidimensional array, this is the length of the inner array
