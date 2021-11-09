@@ -8,31 +8,21 @@
 
 using namespace std;
 
-// ~~~function predeclarations~~~
+vector<unsigned int> loadAddresses();
 
-vector<unsigned int> loadAddresses(); // function to load address list from text file 
-
-// ~~~functions~~~
-
-// ~~main~~
-//
-// ~~~~~~~~
 int main(){
+    char input;
 
-    char input; // variable to store user input for cache selection
-    
-    cout << "Please enter one of the following to select a Cache to simulate:\n"; // prompting user input with printout
+    cout << "Please enter one of the following to select a Cache to simulate:\n";
     cout << "\t1 - Associative Cache\n\t2 - Direct Mapped Cache\n\t3 - 2 Way Set Associative Cache\n";
+    do{
+        cout << "Enter value from 1-3:";
+        cin >> input;
+    }while(input != '1' && input != '2' && input != '3');
 
-    do{ // repeatedly request user input until a value from 1 to 3 has been entered 
-        cout << "Enter value from 1-3:"; // printout prompting user input
-        cin >> input; // recieving the user input
-    }while(input != '1' && input != '2' && input != '3'); // checking if user has entered a valid input
-
-    vector<unsigned int> addr = loadAddresses(); // loading list of addresses into addr vector
-                                                 // these will be used when emulating the cache 
-
-    char input_bytes[4] = {'b','y','t','e'}; // sample bytes to use to emulate bytes being transfered from DRAM
+    vector<unsigned int> addr = loadAddresses();
+    char output;
+    char input_bytes[4] = {'b','y','t','e'}; // sample bytes for addresses
     
     if(input =='1'){ // if user selects associative cache 
         unsigned int cache_size = 0; //variable to store user input for associative cache block size
@@ -77,9 +67,6 @@ int main(){
     return 0;
 }
 
-// ~~loadAddresses~~
-//
-// ~~~~~~~~~~~~~~~~~
 vector<unsigned int> loadAddresses(){
         
     vector<unsigned int> addr_arr; // vector to store addresses in as unsigned ints. this is the return variable

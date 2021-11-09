@@ -14,10 +14,34 @@ TwoWayCache::~TwoWayCache(){ // TwoWayCache destructor
 
 // ~~~TwoWayCache Member Functions~~~
 
-// ~~getByte~~
-// 
-//
-// ~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~getByte~~~~~~~~~~~~~~~~~~~~
+
+    Simulates a Cache Request in a Two Way Set Associative CPU Cache.
+    NOTE: function attempts to match CPU cache handling as close as possible thus computationally inefficient methods may be used so
+    the simulation matches how the hardware operates.  
+
+    ~~ Operation ~~
+
+    Function computes cache requests to determine if the requested address is a hit or a miss.
+    In the event of a cache hit, a byte is returned from TwoWayCache object's cache_entries array.
+    In the event of a cache miss, four bytes are loaded into corresponding set in cache_entries array from input variable. Requested byte is also returned.
+    If the cache misses and both sets for the requested set number are in use, the cache will overwrite on a Least Recently Used basis.
+    For example, if the zeroth way part of the set was the least recently used cache. It will be overwrited next on a cache miss 
+    with the corresponding set number 
+
+    ~~ input variables ~~
+
+    -> int addr = Reqeuested address from the cpu.
+    
+    -> char input_bytes[4] = Array of bytes stored within specific address.
+       As DRAM is not simulated, bytes which are stored in address must be passed into function.
+       This is so data can be loaded into the cache in the event of a cache miss. 
+
+    ~~ output variables ~~
+
+    -> char output_to_cpu = variable to store returned byte from cache data request
+
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
 
     char output_to_cpu; // return variable for byte from cache
@@ -30,7 +54,7 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
     string write_loc; // string to store which cache line is written to for use in result print out
 
     if(cache_entries[0][set_no].upper_tag == upper_tag_no && !cache_entries[0][set_no].invalid){
-        // cache hit on block 0 as tag in address matches tag within cache line from set number
+        // cache hit on way 0 as tag in address matches tag within cache line from set number
         
         print_tag = "hit B0"; // setting print_tag to hit
         write_loc = "hit B0"; // setting print_tag to hit
@@ -41,7 +65,7 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
         hit_counter++; // increment hit counter to track this hit
     }
     else if(cache_entries[1][set_no].upper_tag == upper_tag_no && !cache_entries[1][set_no].invalid){
-        // cache hit on block 1 as tag in address matches tag within set number's cache line
+        // cache hit on way 1 as tag in address matches tag within set number's cache line
 
         print_tag = "hit B1"; // setting print_tag to hit
                               // this is used when printing getByte request result
@@ -55,30 +79,31 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
         print_tag = "miss"; // setting print_tag to miss
                             // this is used when printing getByte request result
 
-        int lru_slot = 0; // variable to help determine which cache slot was the least recently used 
-        if(cache_entries[0][set_no].LRU){ // if zeroth cache block was Least Recently Used
-            lru_slot = 0; // set lru_slot to 0 so 0th cache slot if modified
-            cache_entries[1][set_no].LRU = true; // set cache block 1's corresponding line to Least Recently Used 
+        int lru_slot = 0; // variable to help determine which cache slot was the least recently used
+
+        if(cache_entries[0][set_no].LRU){ // if set on zeroth cache way was Least Recently Used
+            lru_slot = 0; // set lru_slot to 0 so 0th cache slot is modified
+            cache_entries[1][set_no].LRU = true; // set cache ways 1's corresponding line to Least Recently Used 
                                                  // so it will be overwritten in next miss
         }
-        else{ // if first cache block was Least Recently Used
-            lru_slot = 1; // set lru_slot to 1 so 1st cache slot if modified
-            cache_entries[0][set_no].LRU = true; // set cache block 0's corresponding line to Least Recently Used
+        else{ // if set on first cache way was Least Recently Used
+            lru_slot = 1; // set lru_slot to 1 so 1st cache slot is modified
+            cache_entries[0][set_no].LRU = true; // set cache way 0 's corresponding line to Least Recently Used
                                                  // so it will be overwritten in next miss
         }
 
         cache_entries[lru_slot][set_no].upper_tag = upper_tag_no; // setting cache line to corresponding values
-        cache_entries[lru_slot][set_no].invalid = false;          // lru_slot = which cache block to access
-        cache_entries[lru_slot][set_no].LRU = false;              // set_no = which line within block to access
+        cache_entries[lru_slot][set_no].invalid = false;          // lru_slot = which cache way to access
+        cache_entries[lru_slot][set_no].LRU = false;              // set_no = which line within way to access
 
         
         for(int i = 0; i < 4; i++) // iterate through bytes to load
             cache_entries[lru_slot][set_no].bytes[i] = input_bytes[i]; // copy bytes into cache
 
         output_to_cpu =  cache_entries[lru_slot][set_no].bytes[byte_no]; // setting return variable to corresponding byte
-                                                                         // lru_slot = which cache block to access
-                                                                         // set_no = which line within block to access
-                                                                         // byte_no = which byte to access from block
+                                                                         // lru_slot = which cache way to access
+                                                                         // set_no = which line within way to access
+                                                                         // byte_no = which byte to access from line
         miss_counter++; // increment miss counter to track this miss
     }
     
@@ -106,20 +131,28 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
     return output_to_cpu; // return byte from specified cache location
 }
 
-// ~~invalidateCache~~
-// 
-// ~~~~~~~~~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~invalidateCache~~~~~~~~~~~~~~~~~~~~
+
+    Invalidates all cache lines in the Two Way Set Associative CPU Cache.  
+
+    ~~ Operation ~~
+
+    Function resets values on hit and miss counter to 0.
+    For loops is used to iterates through each cache way and cache line in cache_entries inorder to set the invalid flag to true.
+    This means that every entry within the cache will be marked invalid and will not register a hit even if the tag and set numbers match.
+
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 void TwoWayCache::invalidateCache(){
     
     hit_counter = 0; // resetting hit counter
     miss_counter = 0; // resetting miss counter
 
-    for(int i = 0; i < 2; i++){ // iterate through outer array (iterate through the two cache blocks)
+    for(int i = 0; i < 2; i++){ // iterate through outer array (iterate through the two cache ways)
         for(int j = 0; j < sizeof(cache_entries[i])/sizeof(cache_entries[i][0]); j++){ // iterate through each line within cache
             cache_entries[i][j].invalid = true; // invalidate cache line
-            if(i == 0) // if the first cache block is being iterated through
-                cache_entries[i][j].LRU = true; // ensure 0th cache block is set to least recently used. 
-                                                // This is done to ensure that cache block 0 is the first block to be overwritten
+            if(i == 0) // if the first cache way is being iterated through
+                cache_entries[i][j].LRU = true; // ensure 0th cache way is set to least recently used. 
+                                                // This is done to ensure that cache way 0 is the first way to be overwritten with LRU
         }
     }
     return;
@@ -142,5 +175,5 @@ void TwoWayCache::printSpecs(){
     printf("Number of Ways: %d\n", num_of_sets); // print number of sets
     printf("Number of Sets: %d Lines\n", set_size); // print set size
     printf("Cache Size: %d bytes\n", cache_size); // print cache size
-    printf("****\n");
+    printf("\n"); // adding extra line for better output spacing
 }

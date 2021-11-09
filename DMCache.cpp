@@ -10,13 +10,37 @@ DMCache::DMCache(){ // DMCache constructor
 }
 
 DMCache::~DMCache(){ // DMCache destructor
+
 }
 
 // ~~~DMCache Member Functions~~~
 
-// ~~getByte~~
-//
-// ~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~getByte~~~~~~~~~~~~~~~~~~~~
+
+    Simulates a Cache Request in a Direct Mapped CPU Cache.
+    NOTE: function attempts to match CPU cache handling as close as possible thus computationally inefficient methods may be used so
+    the simulation matches how the hardware operates.  
+
+    ~~ Operation ~~
+
+    Function computes cache requests to determine if the requested address is a hit or a miss.
+    In the event of a cache hit, a byte is returned from DMCache object's cache_entries array.
+    In the event of a cache miss, four bytes are loaded into corresponding set in cache_entries array from input variable. Requested byte is also returned.
+    This will overwrite a previous entry.
+
+    ~~ input variables ~~
+
+    -> int addr = Reqeuested address from the cpu.
+    
+    -> char input_bytes[4] = Array of bytes stored within specific address.
+       As DRAM is not simulated, bytes which are stored in address must be passed into function.
+       This is so data can be loaded into the cache in the event of a cache miss. 
+
+    ~~ output variables ~~
+
+    -> char output_to_cpu = variable to store returned byte from cache data request
+
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 char DMCache::getByte(int addr, char input_bytes[4]){
 
     char output_to_cpu; // return variable for byte from cache
@@ -33,8 +57,8 @@ char DMCache::getByte(int addr, char input_bytes[4]){
         print_tag = "hit"; // setting print_tag to hit
                            // this is used when printing getByte request result
         output_to_cpu = cache_entries[set_no].bytes[byte_no]; // set output variable to corresponding byte
-                                                              // set_no = which line within block to access
-                                                              // byte_no = which byte to access from block
+                                                              // set_no = which line within way to access
+                                                              // byte_no = which byte to access from line
         hit_counter++; // increment hit counter to track this hit
     }
     else{
@@ -43,15 +67,15 @@ char DMCache::getByte(int addr, char input_bytes[4]){
         print_tag = "miss"; // setting print_tag to miss
                             // this is used when printing getByte request result
         cache_entries[set_no].upper_tag = upper_tag_no; // set cache line to corresponding values
-        cache_entries[set_no].invalid = false;          // set_no = which line within block to access
+        cache_entries[set_no].invalid = false;          // set_no = which line within way to access
 
         for(int i = 0; i < 4; i++) // iterate through bytes to load
             cache_entries[set_no].bytes[i] = input_bytes[i];  // copy bytes into address 
-                                                              // set_no = which line within block to access
+                                                              // set_no = which line within way to access
 
         output_to_cpu = cache_entries[set_no].bytes[byte_no]; // setting return variable to corresponding byte
-                                                              // set_no = which line within block to access
-                                                              // byte_no = which byte to access from block
+                                                              // set_no = which line within way to access
+                                                              // byte_no = which byte to access from line
         miss_counter++; // increment miss counter to track this miss
     }
 
@@ -79,9 +103,17 @@ char DMCache::getByte(int addr, char input_bytes[4]){
     return output_to_cpu; // return byte from specified cache location
 }
 
-// ~~invalidateCache~~
-// 
-// ~~~~~~~~~~~~~~~~~~~
+/* ~~~~~~~~~~~~~~~~~~~~invalidateCache~~~~~~~~~~~~~~~~~~~~
+
+    Invalidates all cache lines in the Direct Mapped CPU Cache.  
+
+    ~~ Operation ~~
+
+    Function resets values on hit and miss counter to 0.
+    For loop is used to iterate through each cache line in cache_entries and set the invalid flag to true.
+    This means that every entry within the cache will be marked invalid and will not register a hit even if the tag and set numbers match.
+
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 void DMCache::invalidateCache(){
     
     hit_counter = 0; // reseting hit counter
@@ -108,5 +140,5 @@ void DMCache::printSpecs(){
     printf("Number of Ways: %d\n", num_of_sets); // print number of sets
     printf("Number of Sets: %d Lines\n", set_size); // print set size
     printf("Cache Size: %d bytes\n", cache_size); // print cache size
-    printf("****\n");
+    printf("\n"); // adding extra line for better output spacing 
 }
