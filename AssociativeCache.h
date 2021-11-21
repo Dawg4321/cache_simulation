@@ -6,10 +6,27 @@
 
 using namespace std;
 
+/* ~~~ AssociativeCacheLine ~~~
+    
+    Simple Struct which emulates a associative cache line. 
+    This struct is used within an array in the AssociativeCache Class to represent a fully associative cache.
+    As the line is for a fully associative cache, no need to include a set number or LRU bit.
+
+    ~~ variables ~~
+
+    -> bool invalid = a true or false value to mark whether the cache line is valid.
+
+    -> char bytes[4] = an array to represent the bytes stored within the cache line.
+                       length is 4 meaning 2 bits from the address must be used as an offset.
+
+    -> unsigned int tag = integer which represents the tag correlated with each cache line. 
+                          length of values within it must be 30 bits due to 2 bits reserved for byte offset.
+    
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 struct AssociativeCacheLine{
-    bool invalid;
-    unsigned int tag; // 30 bit tag 
-    char bytes[4];
+    bool invalid; // cache valid bit
+    unsigned int tag; // 30 bit tag due to 2 bits used for offset
+    char bytes[4]; // bytes stroed in cache line
 };
 
 class AssociativeCache

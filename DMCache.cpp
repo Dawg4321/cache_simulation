@@ -52,13 +52,21 @@ char DMCache::getByte(int addr, char input_bytes[4]){
     int set_no = (addr&0x0000FFFC)>>2; // gathering set number (14 bits after byte num in addr) using "and" and shift 2 bits to right (set_no>2)
     int upper_tag_no = (addr&0xFFFF0000)>>16; // gathering tag number (16 bits after set number in addr) using "and" and shift 16 bits to the right (tag>16)
     
+    stringstream ss; // stringstream object used for converting hex int to hex string
     string print_tag; // string to store whether cache request was a hit or a miss for use in result print out
-    
+    string write_loc; // string to store which cache line is written to for use in result print out
+
     if(cache_entries[set_no].upper_tag == upper_tag_no && !cache_entries[set_no].invalid){
         // cache hit as tag in address matches tag within set number's cache line
         
-        print_tag = "hit"; // setting print_tag to hit
-                           // this is used when printing getByte request result
+        // setting strings for print output
+
+        print_tag = "hit"; // setting print_tag to hit    
+        write_loc = "N/A"; // setting write_loc to N/A as cache line is not updated in this instance due to miss
+                           // these are used when printing getByte request result
+
+        // cache computations 
+
         output_to_cpu = cache_entries[set_no].bytes[byte_no]; // set output variable to corresponding byte
                                                               // set_no = which line within way to access
                                                               // byte_no = which byte to access from line
@@ -66,9 +74,16 @@ char DMCache::getByte(int addr, char input_bytes[4]){
     }
     else{
         // cache miss (matching upper tag was not found within a valid cache entry of corresponding set number)
+        
+        // setting strings for print output
 
         print_tag = "miss"; // setting print_tag to miss
-                            // this is used when printing getByte request result
+        ss << hex << set_no; // converting hex value of set number into string with stringstream
+        write_loc = ss.str();   // setting write_loc to set number from stringstream as this cache line is updated during cache miss
+                                // these are used when printing getByte request result
+        
+        // cache computations 
+
         cache_entries[set_no].upper_tag = upper_tag_no; // set cache line to corresponding values
         cache_entries[set_no].invalid = false;          // set_no = which line within way to access
 
@@ -86,23 +101,24 @@ char DMCache::getByte(int addr, char input_bytes[4]){
         string line = "--------------------------------------------------------------"; // line string for printf output to help table format
 
         printf("****Direct Mapped Cache Request Table****\n"); // print title
-        // print line seperator
-        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.10s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
+        // print line seperator, breaking line into smaller chuncks to match table column width
+        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.10s+%.11s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
         // print title line of table
-        printf("| # |Address (hex)|tag (hex)|set (hex)|byte# (hex)| hit/miss |hit#|miss#|\n"); 
-        // print line sperator
-        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.10s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
+        printf("| # |Address (hex)|tag (hex)|set (hex)|byte# (hex)| hit/miss |line loaded|hit#|miss#|\n"); 
+        // print line sperator, breaking line into smaller chuncks to match table column width
+        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.10s+%.11s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
     }
     // print details regarding cache 
-    printf("|%3d|   %08x  |   %04x  |   %04x  |     %1x     |Cache %-4s|%4d|%5d|\n",hit_counter + miss_counter, // total number of cache queries
-                                                                                    addr, // address requested
-                                                                                    upper_tag_no, // address tag
-                                                                                    set_no, // address set number
-                                                                                    byte_no, // byte offset
-                                                                                    print_tag.c_str(), // string which prints hit or miss
-                                                                                    hit_counter, // number of hits
-                                                                                    miss_counter // number of misses
-                                                                                    );
+    printf("|%3d|   %08x  |   %04x  |   %04x  |     %1x     |Cache %-4s|   %4s    |%4d|%5d|\n",  hit_counter + miss_counter, // total number of cache queries
+                                                                                                addr, // address requested
+                                                                                                upper_tag_no, // address tag
+                                                                                                set_no, // address set number
+                                                                                                byte_no, // byte offset
+                                                                                                print_tag.c_str(), // string which prints hit or miss
+                                                                                                write_loc.c_str(), // string which prints cache write line
+                                                                                                hit_counter, // number of hits
+                                                                                                miss_counter // number of misses
+                                                                                                );
     return output_to_cpu; // return byte from specified cache location
 }
 

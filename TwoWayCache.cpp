@@ -53,16 +53,22 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
     int set_no = (addr&0xFFFC)>>2; // gathering set number (14 bits after byte num in addr) using "and" and shift 2 bits to right (set_no>2)
     int upper_tag_no = (addr&0xFFFF0000)>>16; // and 16 bits
 
+    stringstream ss; // stringstream object used for converting hex int to hex string
+
     string print_tag; // string to store whether cache request was a hit or a miss for result printing
     string write_loc; // string to store which cache line is written to for use in result print out
 
     if(cache_entries[0][set_no].upper_tag == upper_tag_no && !cache_entries[0][set_no].invalid){
         // cache hit on way 0 as tag in address matches tag within cache line from set number
         
-        print_tag = "hit B0"; // setting print_tag to hit
-        write_loc = "hit B0"; // setting print_tag to hit
-                              // this is used when printing getByte request result
-        
+        // setting strings for print output
+
+        print_tag = "hit W0"; // setting print_tag to hit
+        write_loc = "N/A  "; // setting write_loc to N/A as cache line is not updated in this instance due to miss
+                           // these are used when printing getByte request result
+
+        // cache computations 
+
         output_to_cpu = cache_entries[0][set_no].bytes[byte_no]; // set output variable to corresponding byte from cache
 
         hit_counter++; // increment hit counter to track this hit
@@ -70,8 +76,14 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
     else if(cache_entries[1][set_no].upper_tag == upper_tag_no && !cache_entries[1][set_no].invalid){
         // cache hit on way 1 as tag in address matches tag within set number's cache line
 
-        print_tag = "hit B1"; // setting print_tag to hit
-                              // this is used when printing getByte request result
+        // setting strings for print output
+
+        print_tag = "hit W1"; // setting print_tag to hit
+        write_loc = "N/A  "; // setting write_loc to N/A as cache line is not updated in this instance due to miss
+                           // these are used when printing getByte request result
+
+        // cache computations 
+
         output_to_cpu = cache_entries[1][set_no].bytes[byte_no]; // set output variable to corresponding byte from cache
 
         hit_counter++; // increment hit counter to track this hit
@@ -79,32 +91,40 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
     else{
         // cache miss (matching upper tag was not found within a valid cache entry of corresponding set number)
         
-        print_tag = "miss"; // setting print_tag to miss
-                            // this is used when printing getByte request result
+        // setting strings for print output
 
-        int lru_slot = 0; // variable to help determine which cache slot was the least recently used
+        print_tag = "miss"; // setting print_tag to miss
+        ss << hex << set_no; // converting hex value of set number into string with stringstream
+        write_loc = ss.str();   // setting write_loc to set number from stringstream as this cache line is updated during cache miss
+                                // these are used when printing getByte request result
+
+        // cache computations 
+
+        int lru_way = 0; // variable to help determine which cache way was the least recently used
 
         if(cache_entries[0][set_no].LRU){ // if set on zeroth cache way was Least Recently Used
-            lru_slot = 0; // set lru_slot to 0 so 0th cache slot is modified
+            lru_way = 0; // set lru_way to 0 so 0th cache way is modified
             cache_entries[1][set_no].LRU = true; // set cache ways 1's corresponding line to Least Recently Used 
                                                  // so it will be overwritten in next miss
         }
         else{ // if set on first cache way was Least Recently Used
-            lru_slot = 1; // set lru_slot to 1 so 1st cache slot is modified
+            lru_way = 1; // set lru_way to 1 so 1st cache way is modified
             cache_entries[0][set_no].LRU = true; // set cache way 0 's corresponding line to Least Recently Used
                                                  // so it will be overwritten in next miss
         }
 
-        cache_entries[lru_slot][set_no].upper_tag = upper_tag_no; // setting cache line to corresponding values
-        cache_entries[lru_slot][set_no].invalid = false;          // lru_slot = which cache way to access
-        cache_entries[lru_slot][set_no].LRU = false;              // set_no = which line within way to access
+        write_loc = write_loc + " W" + to_string(lru_way); // concatinating write_loc with way number
+
+        cache_entries[lru_way][set_no].upper_tag = upper_tag_no; // setting cache line to corresponding values
+        cache_entries[lru_way][set_no].invalid = false;          // lru_way = which cache way to access
+        cache_entries[lru_way][set_no].LRU = false;              // set_no = which line within way to access
 
         
         for(int i = 0; i < 4; i++) // iterate through bytes to load
-            cache_entries[lru_slot][set_no].bytes[i] = input_bytes[i]; // copy bytes into cache
+            cache_entries[lru_way][set_no].bytes[i] = input_bytes[i]; // copy bytes into cache
 
-        output_to_cpu =  cache_entries[lru_slot][set_no].bytes[byte_no]; // setting return variable to corresponding byte
-                                                                         // lru_slot = which cache way to access
+        output_to_cpu =  cache_entries[lru_way][set_no].bytes[byte_no]; // setting return variable to corresponding byte
+                                                                         // lru_way = which cache way to access
                                                                          // set_no = which line within way to access
                                                                          // byte_no = which byte to access from line
         miss_counter++; // increment miss counter to track this miss
@@ -114,20 +134,22 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
         string line = "--------------------------------------------------------------"; // line string for printf output to help table format
 
         printf("****2 Way Set Associative Cache Request Table*****\n"); // print title
-        // print line seperator
-        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.12s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
+        // print line seperator, breaking line into smaller chuncks to match table column width
+        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.12s+%.11s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
         // print title line of table
-        printf("| # |Address (hex)|tag (hex)|set (hex)|byte# (hex)|  hit/miss  |hit#|miss#|\n"); 
-        // print line sperator
-        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.12s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
+        printf("| # |Address (hex)|tag (hex)|set (hex)|byte# (hex)|  hit/miss  |line loaded|hit#|miss#|\n"); 
+        // print line sperator, breaking line into smaller chuncks to match table column width
+        printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.12s+%.11s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
     }
     // print details regarding cache 
-    printf("|%3d|   %08x  |   %04x  |   %04x  |     %1x     |Cache %-6s|%4d|%5d|\n",hit_counter + miss_counter, // total number of cache queries
+    
+    printf("|%3d|   %08x  |   %04x  |   %04x  |     %1x     |Cache %-6s|  %7s  |%4d|%5d|\n",hit_counter + miss_counter, // total number of cache queries
                                                                                     addr, // address requested
                                                                                     upper_tag_no, // address tag
                                                                                     set_no, // address set number
                                                                                     byte_no, // byte offset
                                                                                     print_tag.c_str(), // string which prints hit or miss
+                                                                                    write_loc.c_str(), // string which prints cache write line
                                                                                     hit_counter, // number of hits
                                                                                     miss_counter // number of misses
                                                                                     );

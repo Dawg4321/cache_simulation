@@ -66,6 +66,8 @@ char AssociativeCache::getByte(int addr, char input_bytes[4]){
             write_loc = "N/A"; // setting write_loc to N/A as cache line is not updated in this instance
                                // these are used when printing getByte request result
 
+            // cache computations 
+
             output_to_cpu = cache_entries[i].bytes[byte_no]; // set output variable to requested byte
             hit_counter++; // increment hit counter to track this hit
             
@@ -77,10 +79,14 @@ char AssociativeCache::getByte(int addr, char input_bytes[4]){
             // this is allowed as normal cache operation would ensure that all addresses after first invalid are invalid
             // this performance enhancing feature was not implemented as CPU cache computes the hits and misses in parallel
             // inorder for the for loop to operate similar to a parallel operation, all entries must be checked even if it does not make sense from a performance perspective
+            
+            // setting strings for print output
 
             print_tag = "miss"; // setting print_tag to miss
-            write_loc = "0 ";
-                                // these is used when printing getByte request result
+            write_loc = "0 ";   // setting write_loc to 0 as cache line 0 is updated during cache miss
+                                // these are used when printing getByte request result
+
+            // cache computations 
             
             // as Associative cache entries act as a FIFO Queue as each cache entry must be pushed up before write
             // this is not an efficient method as each entry must be moved with each miss 
@@ -92,7 +98,7 @@ char AssociativeCache::getByte(int addr, char input_bytes[4]){
             cache_entries[0].tag = tag_no;
             // ensure inserted data into cache is valid for reading
             cache_entries[0].invalid = false;
-            // copy bytes into address
+            // copy bytes into address location within cache
             for(int j = 0; j < 4; j++)
                 cache_entries[0].bytes[j] = input_bytes[j];
                         
@@ -109,23 +115,23 @@ char AssociativeCache::getByte(int addr, char input_bytes[4]){
         string line = "--------------------------------------------------------------"; // line string for printf output to help table format
 
         printf("****Associative Cache Request Table****\n"); // print title
-        // print line seperator
-        printf("+%.3s+%.13s+%.9s+%.11s+%.10s+%.10s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
+        // print line seperator, breaking line into smaller chuncks to match table column width
+        printf("+%.3s+%.13s+%.9s+%.11s+%.10s+%.11s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
         // print title line of table
-        printf("| # |Address (hex)|tag (hex)|byte# (hex)| hit/miss |set loaded|hit#|miss#|\n"); 
-        // print line sperator
-        printf("+%.3s+%.13s+%.9s+%.11s+%.10s+%.10s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
+        printf("| # |Address (hex)|tag (hex)|byte# (hex)| hit/miss |line loaded|hit#|miss#|\n"); 
+        // print line sperator, breaking line into smaller chuncks to match table column width
+        printf("+%.3s+%.13s+%.9s+%.11s+%.10s+%.11s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
     }
     // print details regarding cache 
-    printf("|%3d|   %08x  | %08x|     %1x     |Cache %-4s|   %4s   |%4d|%5d|\n", hit_counter + miss_counter, // total number of cache queries
-                                                                                addr, // address requested
-                                                                                tag_no, // address tag
-                                                                                byte_no, // byte offset
-                                                                                print_tag.c_str(), // string which prints hit or miss
-                                                                                write_loc.c_str(), // string which prints cache write location
-                                                                                hit_counter, // number of hits
-                                                                                miss_counter // number of misses
-                                                                                );
+    printf("|%3d|   %08x  | %08x|     %1x     |Cache %-4s|   %4s    |%4d|%5d|\n",   hit_counter + miss_counter, // total number of cache queries
+                                                                                    addr, // address requested
+                                                                                    tag_no, // address tag
+                                                                                    byte_no, // byte offset
+                                                                                    print_tag.c_str(), // string which prints hit or miss
+                                                                                    write_loc.c_str(), // string which prints cache write line
+                                                                                    hit_counter, // number of hits
+                                                                                    miss_counter // number of misses
+                                                                                    );
     return output_to_cpu; // return byte from specified cache location
 }
 
