@@ -2,7 +2,7 @@
 
 // ~~~Constructor and Destructors~~~
 
-TwoWayCache::TwoWayCache(){ // TwoWayCache constructor
+TwoWayCache::TwoWayCache():Cache(){ // TwoWayCache constructor
 
     // initialise all values in cache to invalid
     // this must be done before cache can be used hence it is done upon object creation

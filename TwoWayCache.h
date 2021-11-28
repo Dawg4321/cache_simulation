@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string>
 #include <sstream>
+#include "Cache.h"
 
 using namespace std;
 
@@ -31,13 +32,13 @@ struct TwoWayCacheLine{
     unsigned short upper_tag; 
 };
 
-class TwoWayCache
+class TwoWayCache: public Cache
 {
     public:
         // contructor and destructor
         TwoWayCache();
         ~TwoWayCache();
-        // member functions
+        // overwritten functions
         void invalidateCache(); // function to invalidate all entries within cache
         void printSpecs(); // function to print specifications for modelled cache 
         char getByte(unsigned int address, char input_bytes[4]); // function to query cache for a specific address value
@@ -46,8 +47,6 @@ class TwoWayCache
         struct TwoWayCacheLine cache_entries[2][16384]; // Multi-dimensional array holding cache entries
                                                          // each slot of the outer dimension represents each way
                                                          // the inner array represents the cache lines in each way
-        int hit_counter; // counter to track number of cache hits 
-        int miss_counter; // counter to track number of cache misses
 };
 
 #endif

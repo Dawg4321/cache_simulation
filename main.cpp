@@ -24,6 +24,16 @@ vector<unsigned int> loadAddresses();
     Now that all the required information about the cache has been selected, the specifications of the chosen cache are printed.
     This is followed by a table listing the result of each cache request. 
 
+    ~~ Compiling and Running ~~
+    
+    To compile on Unix systems with g++, use the following:
+
+    g++ main.cpp TwoWayCache.cpp AssociativeCache.cpp DMCache.cpp -o cache_sim
+
+    To run, use the following in the directory of compilation:
+
+    ./cache_sim
+
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 int main(){
 
@@ -119,7 +129,7 @@ vector<unsigned int> loadAddresses(){
     addr_file.open("addr.txt",ios::in); // open addr.txt for reading
 
     if (!addr_file.is_open()){  // checking if addr.txt is open
-        cout << "Error opening address text file. Please ensure the address file is called 'addr.txt'\n";
+        cout << "Error opening address text file. Please ensure the address file is called 'addr.txt'\n"; // print error message
         return addr_arr; // return from function with empty vector as addresses can't be loaded
     }
     

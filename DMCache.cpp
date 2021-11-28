@@ -2,7 +2,7 @@
 
 // ~~~Constructor and Destructors~~~
 
-DMCache::DMCache(){ // DMCache constructor
+DMCache::DMCache():Cache(){ // DMCache constructor
 
     // initialise all values in cache to invalid
     // this must be done before cache can be used hence it is done upon object creation
@@ -44,7 +44,7 @@ DMCache::~DMCache(){ // DMCache destructor
     -> char output_to_cpu = variable to store returned byte from cache data request
 
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-char DMCache::getByte(int addr, char input_bytes[4]){
+char DMCache::getByte(unsigned int addr, char input_bytes[4]){
 
     char output_to_cpu; // return variable for byte from cache
 

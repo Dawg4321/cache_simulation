@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string>
+#include "Cache.h"
 
 using namespace std;
 
@@ -29,13 +30,13 @@ struct AssociativeCacheLine{
     char bytes[4]; // bytes stroed in cache line
 };
 
-class AssociativeCache
+class AssociativeCache: public Cache
 {
     public:
         // contructor and destructor
         AssociativeCache(unsigned int size);
         ~AssociativeCache();
-        // member functions
+        // overwritten functions
         void invalidateCache(); // function to invalidate all entries within cache
         void printSpecs(); // function to print specifications for modelled cache 
         char getByte(int addr, char input_bytes[4]); // function to query cache for a specific address value
@@ -44,8 +45,6 @@ class AssociativeCache
         struct AssociativeCacheLine *cache_entries; // dynamic array to store each cache line
                                                     // Each entry represents a cache line
         int num_line; // size of cache lines
-        int hit_counter; // counter to track number of cache hits 
-        int miss_counter; // counter to track number of cache misses
 };
 
 #endif
