@@ -142,17 +142,17 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
         printf("+%.3s+%.13s+%.9s+%.9s+%.11s+%.12s+%.11s+%.4s+%.5s+\n",line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str(), line.c_str());
     }
     // print details regarding cache 
-    
+
     printf("|%3d|   %08x  |   %04x  |   %04x  |     %1x     |Cache %-6s|  %7s  |%4d|%5d|\n",hit_counter + miss_counter, // total number of cache queries
-                                                                                    addr, // address requested
-                                                                                    upper_tag_no, // address tag
-                                                                                    set_no, // address set number
-                                                                                    byte_no, // byte offset
-                                                                                    print_tag.c_str(), // string which prints hit or miss
-                                                                                    write_loc.c_str(), // string which prints cache write line
-                                                                                    hit_counter, // number of hits
-                                                                                    miss_counter // number of misses
-                                                                                    );
+                                                                                            addr, // address requested
+                                                                                            upper_tag_no, // address tag
+                                                                                            set_no, // address set number
+                                                                                            byte_no, // byte offset
+                                                                                            print_tag.c_str(), // string which prints hit or miss
+                                                                                            write_loc.c_str(), // string which prints cache write line
+                                                                                            hit_counter, // number of hits
+                                                                                            miss_counter // number of misses
+                                                                                            );
     return output_to_cpu; // return byte from specified cache location
 }
 
@@ -205,7 +205,7 @@ void TwoWayCache::printSpecs(){
     printf("Cache Line Size: 4 bytes\n"); // print number of bytes per line
     printf("Total Number of Lines: %d Lines\n", num_of_cache_lines); // print number of lines 
     printf("Number of Ways: %d\n", num_of_sets); // print number of sets
-    printf("Number of Sets: %d Lines\n", set_size); // print set size
+    printf("Number of Sets: %d\n", set_size); // print set size
     printf("Cache Size: %d bytes\n", cache_size); // print cache size
     printf("\n"); // adding extra line for better output spacing
 }

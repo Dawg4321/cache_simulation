@@ -7,10 +7,28 @@
 
 using namespace std;
 
+/* ~~~ DMCacheLine ~~~
+    
+    Simple Struct which emulates a direct mapped cache line. 
+    This struct is used within an array in the DMCache Class to represent a direct mapped cache.
+    As the line is for a 1 way direct mapped cache, no need to include an LRU bit.
+
+    ~~ variables ~~
+
+    -> bool invalid = a true or false value to mark whether the cache line is valid.
+
+    -> char bytes[4] = an array to represent the bytes stored within the cache line.
+                       length is 4 meaning 2 bits from the address must be used as an offset.
+
+    -> unsigned int upper_tag = integer which represents the tag correlated with each cache set. 
+                                length of tag must be within 16 bits due to 2 bits reserved for byte offset and 14 bytes for set number.
+    
+   ~~~~~~~~~~~~~~~~~~~*/
 struct DMCacheLine{
     bool invalid;
-    unsigned short upper_tag; 
     char bytes[4];
+    unsigned short upper_tag; 
+    
 };
 
 class DMCache

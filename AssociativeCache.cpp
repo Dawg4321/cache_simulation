@@ -4,7 +4,7 @@
 
 AssociativeCache::AssociativeCache(unsigned int size){ // AssociativeCache constructor
     cache_entries = new AssociativeCacheLine[size]; // allocating AssociativeCacheLine array of user specified size
-    set_size = size; // storing length of cache_entries
+    num_line = size; // storing length of cache_entries
     
     // initialise all values in cache to invalid
     // this must be done before cache can be used hence it is done upon object creation
@@ -52,13 +52,13 @@ char AssociativeCache::getByte(int addr, char input_bytes[4]){
     char output_to_cpu; // return variable from function
 
     int byte_no = addr&0x3; // gathering byte number (last 2 bits in addr) with "and" operation 
-    unsigned int tag_no = (addr&0xFFFFFFFC)>>2; // gathering set number (30 bits after byte num in addr) using "and" and shift 2 bits to right (set_no>2)
+    unsigned int tag_no = (addr&0xFFFFFFFC)>>2; // gathering tag number (30 bits after byte num in addr) using "and" and shift 2 bits to right (tag_no>2)
 
     string print_tag; // string to store whether cache request was a hit or a miss for use in result print out
     string write_loc; // string to store which cache line is written to for use in result print out
 
     // iterate through cache slots to check for cache hit
-    for(int i = 0; i < set_size; i++){
+    for(int i = 0; i < num_line; i++){
         if(cache_entries[i].tag == tag_no && !cache_entries[i].invalid){
             // cache hit as tag in address matches tag within cache line from for loop
 
@@ -73,7 +73,7 @@ char AssociativeCache::getByte(int addr, char input_bytes[4]){
             
             break; // break from loop as hit or miss condition has been met
         }
-        else if (i == set_size - 1){
+        else if (i == num_line - 1){
             // cache miss as end of queue reached without finding a matching valid address
             // performance can be improved by declaring cache miss if current address is invalid
             // this is allowed as normal cache operation would ensure that all addresses after first invalid are invalid
@@ -91,7 +91,7 @@ char AssociativeCache::getByte(int addr, char input_bytes[4]){
             // as Associative cache entries act as a FIFO Queue as each cache entry must be pushed up before write
             // this is not an efficient method as each entry must be moved with each miss 
             // this method was used as it is more representative of how hardware cache handles entries on a miss 
-            for(int i = set_size - 1; i > 0; i--) // iterate through each cache slot
+            for(int i = num_line - 1; i > 0; i--) // iterate through each cache slot
                 cache_entries[i] = cache_entries[i-1]; // move up previous entry to current entry
             
             // append first cache slot with tag 
@@ -147,10 +147,10 @@ char AssociativeCache::getByte(int addr, char input_bytes[4]){
 
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 void AssociativeCache::invalidateCache(){
-    hit_counter = 0; // resetting hit counter
-    miss_counter = 0; // resetting miss counter
+    hit_counter = 0; // resetting hit counter to 0
+    miss_counter = 0; // resetting miss counter to 0
 
-    for(int i = 0; i < set_size; i++) // iterate through each line within cache
+    for(int i = 0; i < num_line; i++) // iterate through each line within cache
         cache_entries[i].invalid = true; // invalidate cache line
     return;
 }
@@ -162,11 +162,11 @@ void AssociativeCache::invalidateCache(){
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 void AssociativeCache::printSpecs(){
     printf("****Cache Specifications****\n"); // print title
-    printf("Cache Line Size: 4 bytes\n"); // print number of bytes per cache line
-    printf("Total Number of Lines: %d Lines\n", set_size); // print number of lines
-    printf("Number of Ways: 1\n"); // print number of sets
-    printf("Number of Sets: %d Lines\n", set_size); // print number of sets
-    printf("Cache Size: %d bytes\n",4*set_size); // print cache size in bytes
+    printf("Cache Line Size: 4 bytes\n"); // print numberof bytes per cache line
+    printf("Total Number of Lines: %d Lines\n", num_line); // print number of lines
+    printf("Number of Ways: 1\n"); // print number of ways
+    printf("Number of Sets: 1\n"); // print number of sets, 1 set as all tags belong in same group
+    printf("Cache Size: %d bytes\n",4*num_line); // print cache size in bytes
                                                    // multiply by 4 as each cache line has 4 bytes
     printf("\n"); // adding extra line for better output spacing
 }
