@@ -71,6 +71,10 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
 
         output_to_cpu = cache_entries[0][set_no].bytes[byte_no]; // set output variable to corresponding byte from cache
 
+        cache_entries[0][set_no].LRU = false; // setting set number line for way 0 to most recently used 
+        cache_entries[1][set_no].LRU = true; // setting set number lime for way 1 to least recently used
+        
+
         hit_counter++; // increment hit counter to track this hit
     }
     else if(cache_entries[1][set_no].upper_tag == upper_tag_no && !cache_entries[1][set_no].invalid){
@@ -85,6 +89,10 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
         // cache computations 
 
         output_to_cpu = cache_entries[1][set_no].bytes[byte_no]; // set output variable to corresponding byte from cache
+
+
+        cache_entries[1][set_no].LRU = false; // setting set number line for way 1 to most recently used
+        cache_entries[0][set_no].LRU = true; // setting set number lime for way 0 to least recently used
 
         hit_counter++; // increment hit counter to track this hit
     }
