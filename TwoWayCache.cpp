@@ -64,7 +64,7 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
         // setting strings for print output
 
         print_tag = "hit W0"; // setting print_tag to hit
-        write_loc = "N/A  "; // setting write_loc to N/A as cache line is not updated in this instance due to miss
+        write_loc = "N/A    "; // setting write_loc to N/A as cache line is not updated in this instance due to miss
                            // these are used when printing getByte request result
 
         // cache computations 
@@ -83,7 +83,7 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
         // setting strings for print output
 
         print_tag = "hit W1"; // setting print_tag to hit
-        write_loc = "N/A  "; // setting write_loc to N/A as cache line is not updated in this instance due to miss
+        write_loc = "N/A    "; // setting write_loc to N/A as cache line is not updated in this instance due to miss
                            // these are used when printing getByte request result
 
         // cache computations 
@@ -121,7 +121,7 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
                                                  // so it will be overwritten in next miss
         }
 
-        write_loc = write_loc + " W" + to_string(lru_way); // concatinating write_loc with way number
+        write_loc = write_loc + " -> W" + to_string(lru_way); // concatinating write_loc with way number
 
         cache_entries[lru_way][set_no].upper_tag = upper_tag_no; // setting cache line to corresponding values
         cache_entries[lru_way][set_no].invalid = false;          // lru_way = which cache way to access
@@ -151,7 +151,7 @@ char TwoWayCache::getByte(unsigned int addr, char input_bytes[4]){
     }
     // print details regarding cache 
 
-    printf("|%3d|   %08x  |   %04x  |   %04x  |     %1x     |Cache %-6s|  %7s  |%4d|%5d|\n",hit_counter + miss_counter, // total number of cache queries
+    printf("|%3d|   %08x  |   %04x  |   %04x  |     %1x     |Cache %-6s| %10s|%4d|%5d|\n",hit_counter + miss_counter, // total number of cache queries
                                                                                             addr, // address requested
                                                                                             upper_tag_no, // address tag
                                                                                             set_no, // address set number
