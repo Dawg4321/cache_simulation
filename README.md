@@ -10,8 +10,10 @@ This is a simple program which simulates read operation on a a series of CPU cac
 
 ## Compilation
 
-Code is built around Linux though should work fine with Windows. To compile this code with g++, run the following commands with all of the code files in the working directory:
+Code is built around Linux though should work fine with Windows. To compile this code with g++, run the following command with all of the code files in the working directory:
 
-1 - g++ main.cpp TwoWayCache.cpp AssociativeCache.cpp DMCache.cpp -o myprog
+```g++ main.cpp TwoWayCache.cpp AssociativeCache.cpp DMCache.cpp -o myprog```
 
-2 - ./myprog
+Once compiled, the simulator can then be run by using the following command in the directory of the compiled file:
+
+```./myprog```
